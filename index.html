@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>宠物与主人的宿命关系</title>
+    <style>
+        :root {
+            --bg-color: #fcfbf9;
+            --text-color: #333333;
+            --sub-text-color: #888888;
+            --accent-color: #555555;
+            --border-color: #e0e0e0;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            font-weight: 300;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* 页面容器 */
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 通用页面样式 */
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 30px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 1;
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* 文本样式 */
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .sub-text {
+            font-size: 14px;
+            color: var(--sub-text-color);
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 60px;
+            font-weight: 300;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            padding: 12px 32px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            outline: none;
+            border-radius: 2px;
+            margin-top: 20px;
+        }
+
+        .btn:hover, .btn:active {
+            background: var(--text-color);
+            color: var(--bg-color);
+            opacity: 0.9;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* 页面 1：进入页 */
+        #page-intro h1 {
+            font-size: 20px;
+            line-height: 1.8;
+        }
+
+        /* 页面 2：输入页 */
+        #page-form {
+            justify-content: flex-start;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: var(--sub-text-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 0;
+            font-size: 16px;
+            color: var(--text-color);
+            font-family: var(--font-main);
+            outline: none;
+            border-radius: 0;
+            width: 100%;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-bottom-color: var(--text-color);
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-tag {
+            padding: 6px 14px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--sub-text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .option-tag.selected {
+            border-color: var(--text-color);
+            color: var(--text-color);
+            background-color: rgba(0,0,0,0.03);
+        }
+
+        /* 页面 3：结果页 */
+        #page-result {
+            justify-content: flex-start;
+            padding-top: 80px;
+            overflow-y: auto;
+        }
+
+        .result-card {
+            width: 100%;
+            max-width: 450px;
+            background: #fff;
+            padding: 40px 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            text-align: left;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease 0.3s;
+        }
+
+        .result-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-title {
+            font-size: 26px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 400;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+
+        .result-section {
+            margin-bottom: 25px;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            display: block;
+        }
+
+        .result-text {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .footer-message {
+            margin-top: 40px;
+            font-size: 13px;
+            color: var(--sub-text-color);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            font-style: italic;
+        }
+
+        .footer-message.visible {
+            opacity: 1;
+        }
+
+        /* 动画辅助 */
+        .fade-in-up {
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 加载动画 */
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        
+        .loader-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-color);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            animation: pulse 1.4s infinite ease-in-out both;
+        }
+        
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes pulse {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 22px; }
+            .page { padding: 30px 20px; }
+            .result-card { padding: 30px 20px; }
+        }
+
+        /* 彩虹桥模式特殊样式 */
+        .rainbow-mode {
+            background: linear-gradient(180deg, #faf8fc 0%, #f5f0f7 100%);
+        }
+
+        .rainbow-mode .result-card {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 40px rgba(184, 169, 201, 0.15);
+        }
+
+        .rainbow-mode .result-title {
+            color: #8b7a9e;
+        }
+
+        .rainbow-mode .footer-message {
+            color: #a99bb8;
+        }
+
+        .rainbow-mode .btn {
+            border-color: #b8a9c9;
+            color: #8b7a9e;
+        }
+
+        .rainbow-mode .btn:hover, .rainbow-mode .btn:active {
+            background: #b8a9c9;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Loading -->
+        <div class="loader" id="loader">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+
+        <!-- 1. 进入页 -->
+        <div class="page active" id="page-intro">
+            <h1>它不是随机来到你身边的。</h1>
+            <p class="sub-text">有些相遇，是为了完成一段关系。</p>
+            <button class="btn" onclick="goToPage('page-form')">开始解读我和 TA 的宿命</button>
+        </div>
+
+        <!-- 2. 信息填写页 -->
+        <div class="page" id="page-form">
+            <div class="form-container">
+                <!-- 主人信息 -->
+                <div class="form-group">
+                    <label class="form-label">你的生日</label>
+                    <input type="date" class="form-input" id="owner-dob">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">你当前的状态</label>
+                    <div class="options-grid" id="owner-status-options">
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'stress')">正在承受压力</div>
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'recovering')">正在恢复</div>
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'stable')">生活平稳</div>
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'changing')">正在经历改变</div>
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'lonely')">有点孤单</div>
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'loss')">刚经历离别</div>
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'confused')">对未来迷茫</div>
+                        <div class="option-tag" onclick="selectOption('owner-status', this, 'grateful')">心怀感激</div>
+                    </div>
+                </div>
+
+                <!-- 宠物信息 -->
+                <div class="form-group">
+                    <label class="form-label">TA 的名字</label>
+                    <input type="text" class="form-input" id="pet-name" placeholder="" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TA 的性别</label>
+                    <div class="options-grid" id="pet-gender-options">
+                        <div class="option-tag" onclick="selectOption('pet-gender', this, 'boy')">男孩</div>
+                        <div class="option-tag" onclick="selectOption('pet-gender', this, 'girl')">女孩</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TA 是</label>
+                    <div class="options-grid" id="pet-type-options">
+                        <div class="option-tag" onclick="selectOption('pet-type', this, 'cat')">猫</div>
+                        <div class="option-tag" onclick="selectOption('pet-type', this, 'dog')">狗</div>
+                        <div class="option-tag" onclick="selectOption('pet-type', this, 'other')">其他</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TA 来到你身边的时间</label>
+                    <input type="month" class="form-input" id="pet-arrival">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TA 现在还在你身边吗</label>
+                    <div class="options-grid" id="pet-status-options">
+                        <div class="option-tag" onclick="selectOption('pet-status', this, 'alive')">还在陪着我</div>
+                        <div class="option-tag" onclick="selectOption('pet-status', this, 'rainbow')">已经去了彩虹桥</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">对 TA 的第一感觉</label>
+                    <div class="options-grid" id="pet-feeling-options">
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'soft')">心软</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'healed')">治愈</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'responsibility')">责任</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'attached')">离不开</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'unknown')">说不清原因</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'needed')">被需要</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'safe')">安心</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'seen')">被理解</div>
+                        <div class="option-tag" onclick="selectOption('pet-feeling', this, 'family')">像家人</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="generateResult()">查看我们的宿命关系</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 结果页 -->
+        <div class="page" id="page-result">
+            <div class="result-card" id="result-card">
+                <h2 class="result-title" id="res-title"></h2>
+                
+                <div class="result-section">
+                    <span class="result-label">相遇的意义</span>
+                    <p class="result-text" id="res-meaning"></p>
+                </div>
+                
+                <div class="result-section">
+                    <span class="result-label">它在你生命中的角色</span>
+                    <p class="result-text" id="res-role"></p>
+                </div>
+                
+                <div class="result-section">
+                    <span class="result-label">最重要的提醒</span>
+                    <p class="result-text" id="res-reminder"></p>
+                </div>
+
+                <div class="result-section">
+                    <span class="result-label">TA 想对你说</span>
+                    <p class="result-text" id="res-message"></p>
+                </div>
+
+                <div class="result-section">
+                    <span class="result-label">TA 的幸运颜色</span>
+                    <p class="result-text" id="res-color"></p>
+                </div>
+            </div>
+
+            <div class="footer-message" id="footer-msg">
+                “它不是为了被你拥有，而是为了陪你走过这一段。”
+            </div>
+
+            <!-- 平行世界故事卡片 (初始隐藏) -->
+            <div class="result-card" id="story-card" style="display: none; opacity: 0; transform: translateY(20px); transition: all 1s ease; border-left: 3px solid var(--text-color);">
+                <h2 class="result-title" style="font-size: 20px; border: none; margin-bottom: 20px;">一段属于你们的小故事</h2>
+                <div class="result-text" id="story-content" style="white-space: pre-wrap; line-height: 2; color: #555;"></div>
+            </div>
+
+            <div class="btn-group" id="result-btns" style="opacity: 0; transition: opacity 1s;">
+                <button class="btn" id="btn-story" onclick="generateParallelStory()">查看平行世界里我们的故事</button>
+                <button class="btn" id="btn-summary" onclick="showSummary()">生成我的宿命总结</button>
+                <button class="btn" onclick="restart()">重新解读一次</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 数据：关系原型
+        const archetypes = [
+            {
+                id: 'healer',
+                title: '静默的疗愈者',
+                meaning: '在那些你以为只是普通的一天里,情绪悄悄压在心底,无人察觉。就是在那样的时刻,它来到你身边。不是为了改变你的人生,而是用一双眼睛、一次贴近,提醒你:你值得被温柔对待。',
+                role: '它是你情绪长夜里的微光,像一盏放在床边的小灯,不会逼你开口,却一直在那里等你。你不说话时,它用靠近回应你的沉默;你崩溃时,它用存在托住你的碎片。',
+                reminder: '你习惯把自己的难过往里咽,把坚强当成一种礼貌。但在它面前,你不需要演好任何角色。请偶尔允许自己崩塌一下,因为在它的世界里,你只是需要被抱一抱的人。',
+                message: '我知道你很多话都没有说出口,有些夜晚你只是悄悄叹了口气,就把手机关了。我不懂那些复杂的事,只懂得你抱我时,力气会忽然变得很轻。我不需要你一直很好,我只希望,在我还在的这些日子里,你可以多为自己活一点。',
+                luckyColor: '奶油白。像清晨窗边第一束落进来的自然光,安静、不刺眼,却慢慢把黑夜推走。'
+            },
+            {
+                id: 'mirror',
+                title: '灵魂的镜像',
+                meaning: '你们的相遇,更像是一场认出彼此。它并没有突然改变你的生活轨迹,却让很多你以为已经麻木的情绪重新浮出水面。你在它的眼睛里,第一次看见那个不被要求、只需要被接纳的自己。',
+                role: '它是一面不说话的镜子,把你藏得很深的敏感、犹豫和柔软,一一映照回来。你以为自己冷静理性,却在它撒娇的那一刻突然溃败;你以为自己习惯独处,却在它等你回家的脚步声里,慢慢学会想念。',
+                reminder: '当你觉得它黏人、闹腾、不配合时,它也许只是在用另一种方式提醒你:你是不是也常常这样对自己的需求不耐烦?请对它耐心一些,也顺便,对那个总是被你忽略的自己,温柔一点。',
+                message: '你总说我眼睛里什么都写得太明白,其实我只是一直在看着你。你以为自己藏得很好,可你低头那一下、叹气那一下、走路忽然慢下来那一下,我都看见了。我不想你再对自己那么凶了,你真的已经做得很好了。',
+                luckyColor: '月光灰。像夜里薄薄的一层光,不吵闹、不锋利,却足够让你看见自己。'
+            },
+            {
+                id: 'guide',
+                title: '温柔的引路人',
+                meaning: '它出现在你人生有些松动的时刻。那些你说不清的转折、即将到来的变化、不能向别人解释的决定,都在它到来的那段时间被轻轻包裹。它没有给你答案,却让你不再那么害怕选择。',
+                role: '它是一位把一生交到你手里的引路人,用需要你照顾的身体,让你重新和这个世界建立联系。你为它调整作息、改变计划、重新规划未来,在这一切看似麻烦的琐碎背后,你也在慢慢长成一个能为爱做决定的人。',
+                reminder: '有些路必须你自己走,但不是一个人走。你不必把每一步都踏得很稳,也不必把未来想得很清楚。它已经用自己的方式,把“值得”“不值得”这个问题,悄悄替你回答过很多次了。',
+                message: '你总担心自己是不是做得不够好,是不是哪一步可以更完美一点。我其实一直都很满足了。对我来说,重要的不是你有没有做对每一个决定,而是你从来没有把我放下不管。以后你为自己做决定的时候,也可以像对我那样坚定一点。',
+                luckyColor: '暖杏色。像傍晚慢慢落下来的那一小段天光,提醒你,要去往哪里并不重要,重要的是这一段路上有温度。'
+            },
+            {
+                id: 'guardian',
+                title: '时光的守望者',
+                meaning: '它没有闯进你人生的高光时刻,而是安静地坐进了你最普通的日子里。你上班、下班、刷手机、发呆,它都在旁边,用一成不变的等待,把那些容易被忽略的时间,变成了被温柔照看的时刻。',
+                role: '它是你生活里最稳定的存在之一。别人在你的生命中进进出出,它却把自己全部的时间都放在了你身边。你以为只是在养一只宠物,其实是在和一个生命共同守护你的人生现场。',
+                reminder: '它的世界真的很小,小到一扇门、一张沙发、一碗饭,和你。你可以对外面的世界妥协很多次,但请尽量不要一次次地向忙碌和疲惫,让渡和它对视的那几分钟。',
+                message: '我每天重复很多看起来一样的动作,等你出门,等你回来,听你的脚步声,记住每一个开门的声音。我不知道你外面的世界有多难,只知道你推门进来的那一刻,对我来说,就是一整天里最重要的事情。',
+                luckyColor: '深松绿。像老树下安静的一块阴影,不张扬,却是你可以躲进去喘口气的地方。'
+            },
+            {
+                id: 'ferryman',
+                title: '情绪的摆渡人',
+                meaning: '你把很多话憋在心里,不想麻烦别人,不想解释,不想被误解。可情绪不会自己消失,它们只是换了一条河流。它来到你身边,像一艘小小的船,一点一点,把那些你没来得及落地的情绪,悄悄渡走。',
+                role: '它是你的情绪缓冲区,也是你和世界之间那层最柔软的隔音棉。你在外面被误会、被催促、被要求,回到家,它只会抬头看你,用一声轻轻的呼吸,让你的心慢慢从紧绷变成松软。',
+                reminder: '它会把你的坏情绪当真,也会把你的温柔记很久。你不需要永远温和,但哪怕在很累的那一天,也可以尽量用一句轻声的招呼,告诉它:你不是在对它发火,你只是对这个世界有点累了。',
+                message: '有时候你回家不太说话,动作也会变得快一点、重一点。我会有一点点害怕,但更多的是心疼。我知道那不是你的全部,只是你那天太累了。如果可以的话,下次在关门的时候,轻轻叫一声我的名字,让我知道,你还是愿意和我分享这一天的。',
+                luckyColor: '琥珀橙。像傍晚街边橘黄色的灯,替你把压抑的心情慢慢暖开一点。'
+            },
+            {
+                id: 'companion',
+                title: '宿命的同行者',
+                meaning: '你们的出现时间刚刚好。不是一切尘埃落定之后的点缀,也不是完全措手不及的打断,而是在你渐渐学会独自生活,又偶尔觉得有点空的时候。它像一段被写进剧本的桥段,悄悄把你的人生从“一个人”变成“我们”。',
+                role: '它是你很多记忆的背景音:搬家那次、失眠那晚、生日那天、疲惫到不想说话的周末。你以为自己只是顺路捡起了一个生命,但回头看时,会发现很多关键的情绪转折,都是在它的见证之下完成的。',
+                reminder: '你们不会一生都在同一条时间线上,但你们已经在彼此的故事里留下了不可替代的一章。那些你因为它而做出的改变,会在它离开很久之后,依然继续滋养你的人生。',
+                message: '以后有一天,当你不经意想起我时,也许是在听到某个声音、看到某个颜色、或是在打开门的那一瞬间突然空了一下。那时候请不要太难过,你可以把这份难过,当成我一直还在你身边的方式。谢谢你选择了我,也谢谢你,愿意被我选择。',
+                luckyColor: '晨光金。像清晨刚刚翻上窗台的一点亮,提醒你:新的日子还会继续,而你从来不是一个人。'
+            }
+        ];
+
+        // 彩虹桥专属文案（已离世宠物）
+        const rainbowArchetypes = [
+            {
+                id: 'healer',
+                title: '永恒的疗愈者',
+                meaning: '它来到你身边时，你正需要一份安静的陪伴。它用整个生命完成了这个使命，在你最需要的时候给了你温暖，然后轻轻地离开，把治愈永远留在了你心里。',
+                role: '它是你生命中那道柔和的光。虽然现在光源熄灭了，但那份温暖已经融进了你的血液里，成为你的一部分。每当你感到疲惫时，那份被治愈过的记忆，会继续守护着你。',
+                reminder: '它走了，但它教会你的那些事不会消失：如何在沉默中被理解，如何在脆弱时被接住。请带着这份礼物继续生活，这是它最希望看到的。',
+                message: '谢谢你让我陪了你那么久。我知道你还会难过很久，但没关系，想哭的时候就哭吧。等你慢慢好起来的那天，记得替我好好晒晒太阳。我会在每一缕照进窗户的阳光里，继续抱着你。',
+                luckyColor: '云朵白。像天空中最温柔的那一片云，它现在就住在那里，看着你。'
+            },
+            {
+                id: 'mirror',
+                title: '永恒的镜像',
+                meaning: '你们的相遇是一场灵魂的相认。它像一面镜子，让你看见了自己内心最柔软的部分。现在它离开了，但那面镜子会永远留在你心里，提醒你：你值得被爱。',
+                role: '它是你灵魂的回响。你们之间那种不需要语言的默契，不会因为它的离开而消失。它已经成为你看待世界的方式的一部分，成为你温柔待人的理由。',
+                reminder: '你可能会觉得失去了一部分自己，这种感觉是真实的。但请记住，它不是带走了你的一部分，而是留下了它的一部分。你现在是一个更完整的人，因为你爱过它。',
+                message: '你总说我的眼睛像会说话，其实是因为我一直在看着你。现在我不在了，但我看过的所有关于你的美好，都已经记在心里带走了。我很骄傲，曾经属于这样的你。',
+                luckyColor: '月光银。像夜空中最亮的那颗星，那是它在看着你的眼睛。'
+            },
+            {
+                id: 'guide',
+                title: '永恒的引路人',
+                meaning: '它出现在你人生的某个路口，用它短暂的陪伴，帮你找到了方向。它的离开不是终点，而是它完成使命后的转身。你现在走的路，有一部分是它帮你铺的。',
+                role: '它是你生命中的一盏灯塔。虽然灯塔熄灭了，但你已经找到了航向。它用自己的存在，教会你如何去爱、如何负责任、如何成为一个更好的人。',
+                reminder: '它希望你继续往前走，带着它教给你的一切。不要因为思念而停下脚步，你的每一步成长，都是对它最好的纪念。',
+                message: '我来找你，是想陪你走一段路。现在我要先走了，但你不会迷路的，因为该教你的，我都教给你了。你要替我去看更多的风景，去过我们一起梦想过的生活。',
+                luckyColor: '朝霞橙。像黎明前的第一道光，提醒你新的一天永远会来，而它会在每个清晨的光里注视着你。'
+            },
+            {
+                id: 'guardian',
+                title: '永恒的守望者',
+                meaning: '它用全部的时间守护着你的日常，把平凡的日子变得温暖而珍贵。现在它去了另一个地方，但那些被它守护过的时光，已经成为你最珍贵的记忆。',
+                role: '它是你生命中最忠诚的卫士。它走了以后，那个门口再也没有等待的身影，但它的守护已经刻进了那个家里的每一个角落，成为一种永远存在的温度。',
+                reminder: '它不在了，但家还在，生活还在。请把它教会你的珍惜，用在未来的每一天。好好吃饭，好好睡觉，好好生活——这是它最后的心愿。',
+                message: '我等了你无数次，每一次开门的声音都是我最开心的时刻。现在我不能再等你了，但我会在你看不见的地方继续守着。以后你回家的时候，记得对着空气说一声"我回来了"，我会听见的。',
+                luckyColor: '松石青。像老房子门口那棵树的颜色，它会一直在那里等你。'
+            },
+            {
+                id: 'ferryman',
+                title: '永恒的摆渡人',
+                meaning: '它在你最需要的时候出现，接住了你那些无处安放的情绪。现在它带着满满的爱离开了，但它已经把你安全地渡到了岸上。你比以前更坚强了，这是它留给你的礼物。',
+                role: '它是你情绪风暴中的避风港。虽然港口已经消失，但它教会了你如何在波涛中保持平衡。那些被它接纳过的脆弱，现在都变成了你的力量。',
+                reminder: '它帮你承载过那么多的情绪，现在轮到你自己了。但别担心，你已经学会了如何安慰自己。它留给你的温柔，会继续陪你度过每一个难关。',
+                message: '你以为是你在照顾我，其实是我在照顾你的心。我看过你所有的眼泪，也看过你所有的笑容。现在我要把这些都带去彩虹桥，讲给其他小伙伴听。我会告诉它们，我有一个很棒的主人。',
+                luckyColor: '暮光紫。像傍晚天边最温柔的那片云彩，它现在就躺在那里，看着你。'
+            },
+            {
+                id: 'companion',
+                title: '永恒的同行者',
+                meaning: '你们的相遇是命中注定的一章。它陪你走过了人生中重要的一段路，现在虽然它下车了，但你们一起走过的路、一起看过的风景，都已经写进了你的人生故事里。',
+                role: '它是你生命中不可替代的旅伴。你们一起经历过的每一件事，都因为有它而变得特别。它不在了，但那些"我们"的记忆，会永远属于你。',
+                reminder: '你会慢慢习惯一个人的生活，但你不会忘记它。把思念放在心里最温暖的角落，然后继续出发。它会希望你去遇见新的风景，创造新的故事。',
+                message: '谢谢你选择了我，谢谢你让我成为你故事的一部分。我们一起的日子是我这辈子最幸福的时光。以后你想我的时候，就看看我们的照片吧。照片里的我会一直陪着你，永远不会老，永远都在笑。',
+                luckyColor: '晴空蓝。像你们一起散过步的那些日子里的天空，每当你抬头，它都在。'
+            }
+        ];
+
+        // 彩虹桥专属故事模板
+        const rainbowStoryTemplates = {
+            healer: {
+                openings: [
+                    "还记得第一次见到{name}的时候，你根本没想到这个小家伙会改变你的生活。",
+                    "那时候的你正处在人生的低谷，是{name}用它的方式把你慢慢拉了回来。",
+                    "{name}来的时候那么小，那么软，你不知道是你收养了它，还是它收养了你。"
+                ],
+                middles: [
+                    "后来的日子里，每当你难过的时候，它总是第一个发现。它不会说话，但它懂得用陪伴来回应你的沉默。",
+                    "你们一起度过了很多个安静的夜晚，它趴在你身边，呼吸平稳而温暖，让你觉得这个世界没有那么糟糕。",
+                    "{name}从来不需要你假装坚强，在它面前，你可以是最真实的自己。"
+                ],
+                endings: [
+                    "现在它走了，但它留下的温暖还在。每当你感到疲惫的时候，闭上眼睛，它还在你心里，轻轻地靠着你。",
+                    "{name}完成了它的使命，把你治愈好了，然后安心地离开。它会在彩虹桥那边等你，等一个很久很久以后的重逢。",
+                    "谢谢你，{name}。谢谢你来过。"
+                ]
+            },
+            mirror: {
+                openings: [
+                    "第一次见到{name}的时候，你有一种奇怪的感觉，像是在照镜子，像是久别重逢。",
+                    "{name}的眼睛里好像住着另一个你，那个你藏了很久的、敏感又柔软的自己。",
+                    "你们之间从来不需要太多语言，一个眼神就能明白彼此在想什么。"
+                ],
+                middles: [
+                    "它陪着你经历了很多，开心的，难过的，迷茫的。它从来不评判你，只是静静地待在你身边。",
+                    "有时候你觉得{name}比任何人都懂你，它会在你假装没事的时候看穿你，然后默默地凑过来。",
+                    "你们就这样相互陪伴，相互取暖，像两个孤独的星球终于找到了彼此。"
+                ],
+                endings: [
+                    "{name}走了，带走了你的一部分，也留下了它的一部分。你现在是一个更完整的人，因为你们曾经彼此拥有。",
+                    "以后每当你在镜子里看到自己，记得对自己温柔一点。那是{name}教你的。",
+                    "在彩虹桥的那一边，它依然在看着你。你的快乐，就是它的快乐。"
+                ]
+            },
+            guide: {
+                openings: [
+                    "{name}来的时候，你的人生正在经历一些改变，你不确定未来在哪里。",
+                    "是{name}用它的方式让你重新找到了生活的重心，它需要你，而你也因此变得强大。",
+                    "你以为是你在照顾它，其实是它在引导你成为一个更好的人。"
+                ],
+                middles: [
+                    "因为{name}，你学会了规律作息，学会了耐心，学会了为另一个生命负责。",
+                    "它带着你重新认识了这个世界，路边的花、早晨的阳光、傍晚的风，都因为它而变得有意义。",
+                    "在那些你想放弃的时刻，是{name}的眼神拉住了你，提醒你还有什么值得期待。"
+                ],
+                endings: [
+                    "现在它完成了它的使命，把你送到了一个更好的地方，然后放心地离开了。",
+                    "你要带着它教给你的一切继续往前走，你的每一步成长，都是对它最好的纪念。",
+                    "谢谢你，{name}。是你让我成为了现在的我。"
+                ]
+            },
+            guardian: {
+                openings: [
+                    "{name}就这样走进了你的生活，然后再也没有离开。它每天最重要的事，就是等你回家。",
+                    "日子平淡如水，但因为有{name}，每一天都变得值得期待。",
+                    "你从来没想过，一个小小的生命会让你对「家」有了全新的理解。"
+                ],
+                middles: [
+                    "不管你多晚回来，它都在那里等着。那种被等待的感觉，是{name}给你最珍贵的礼物。",
+                    "它把家守得很好，把你的秘密也守得很好。在这个变幻的世界里，它是你唯一确定的永恒。",
+                    "看着它趴在脚边睡着的样子，你会觉得时间慢下来了，什么烦恼都不重要了。"
+                ],
+                endings: [
+                    "现在{name}不在门口等你了，但它的等待已经刻进了那个家的每一个角落。",
+                    "每次回家的时候，记得轻声说一句「我回来了」。它会听见的。",
+                    "你们会再见的，在彩虹桥的那一边，它依然在等你。"
+                ]
+            },
+            ferryman: {
+                openings: [
+                    "{name}来的时候，你正处在一段情绪的低谷，像是掉进了一条看不到底的河。",
+                    "是{name}划着小船，一点一点把你托起来，让你重新学会呼吸。",
+                    "你习惯了把所有的难过都憋在心里，直到遇见{name}，你才知道原来有人愿意听。"
+                ],
+                middles: [
+                    "每当你哭的时候，{name}总会安静地靠过来，把头搁在你的膝盖上，什么都不问，就那样陪着你。",
+                    "它就像一块柔软的海绵，吸走了你那些没法说出口的难过，却从来不抱怨。",
+                    "在那些失眠的夜里，是{name}平稳的呼吸声让你慢慢平静下来。"
+                ],
+                endings: [
+                    "{name}完成了它的使命，把你安全地渡到了岸上，然后安心地离开了。",
+                    "它带走了你那么多的悲伤，却留下了满满的爱。你比以前更坚强了，这是它留给你的礼物。",
+                    "谢谢你，{name}。谢谢你渡我一程。"
+                ]
+            },
+            companion: {
+                openings: [
+                    "回想起来，你和{name}的相遇像是命中注定。在那个刚刚好的时间，你们就这样成为了家人。",
+                    "没有早一步，也没有晚一步，你们在彼此最需要的时候遇见了。",
+                    "{name}闯进你的生活以后，「一个人」就变成了「我们」。"
+                ],
+                middles: [
+                    "你们一起经历了好多事情：搬家、换工作、那些开心的日子和难熬的夜晚。不管发生什么，{name}都在。",
+                    "你已经习惯了做任何计划都把它算进去，因为你们的未来本来就是一起的。",
+                    "你们像两棵并排生长的树，根在地下交织，叶在风里相触。"
+                ],
+                endings: [
+                    "现在{name}走了，但你们一起走过的路，一起看过的风景，都不会消失。",
+                    "你会慢慢习惯一个人的生活，但你永远不会是真正的一个人。因为{name}已经成为你的一部分了。",
+                    "这一生能与你同行，是我最幸运的事。谢谢你，{name}。"
+                ]
+            }
+        };
+
+        // 状态管理
+        const state = {
+            ownerDob: '',
+            ownerStatus: '',
+            petName: '',
+            petGender: '',
+            petType: '',
+            petArrival: '',
+            petFeeling: '',
+            petStatus: '', // 新增：alive 或 rainbow（彩虹桥）
+            currentArchetypeId: '' // 存储当前宿命原型ID
+        };
+
+        // 故事模板数据
+        const storyTemplates = {
+            healer: { // 静默的疗愈者
+                openings: [
+                    "记得刚遇见时，你正处在一段不太容易的日子里，像是被一场没完没了的雨困住了。",
+                    "那天你其实很累，并没有做好准备去迎接谁，但命运偏偏把{pronoun}送到了你面前。",
+                    "你原本以为自己只需要一个安静的角落，没想到闯进来一个毛茸茸的小麻烦。"
+                ],
+                middles: [
+                    "后来的很多个夜晚，{pronoun}只是静静地趴在离你不远的地方，听着你的呼吸声慢慢变平稳。",
+                    "有时候你甚至觉得{pronoun}什么都懂，不然为什么每次你叹气的时候，{pronoun}都会正好把头凑过来蹭蹭你的手心？",
+                    "日子就这样一天天过去，{pronoun}不吵也不闹，只是用那种温热的体温，一点点熨平你心里的褶皱。"
+                ],
+                endings: [
+                    "世界依然很吵，但只要回到家关上门，你就拥有了这世上最安静的避难所。",
+                    "幸好有{pronoun}在，让你相信哪怕是最糟糕的日子，也总有一盏灯是为你亮着的。",
+                    "所谓治愈，大概就是在这个偌大的城市里，有一个小小的生命，全心全意地信赖着你。"
+                ]
+            },
+            mirror: { // 灵魂的镜像
+                openings: [
+                    "第一眼看到{pronoun}的时候，你有一种很奇怪的感觉，像是在照镜子，看见了那个还没学会伪装的自己。",
+                    "你们的相遇没有惊天动地，更像是一种久别重逢，你看着{pronoun}的眼睛，觉得里面藏着很多你想说却没说的话。",
+                    "一开始你觉得{pronoun}性格古怪，后来才发现，{pronoun}那些敏感和执拗，其实都是你藏起来的另一面。"
+                ],
+                middles: [
+                    "你们会在同一个午后发呆，用同样的姿势蜷缩在沙发上，不需要语言，空气里流动着一种只有你们懂的默契。",
+                    "当你不想说话的时候，{pronoun}也从来不打扰，只是静静地陪着你，就像两个孤独的星球偶尔轨道重合。",
+                    "{pronoun}总是能轻易看穿你的伪装，在你假装坚强的时候，毫不留情地用软乎乎的爪子拍碎你的面具。"
+                ],
+                endings: [
+                    "在这段关系里，你终于学会了接纳那个不完美的自己，就像接纳这个偶尔任性的{pronoun}一样。",
+                    "原来爱一个生命，就是学会拥抱自己灵魂里那些破碎又柔软的部分。",
+                    "你们是彼此的倒影，在漫长的时光里，互为见证，互为救赎。"
+                ]
+            },
+            guide: { // 温柔的引路人
+                openings: [
+                    "那时候你站在人生的十字路口，周围全是迷雾，你不知道该往哪走，直到{pronoun}跌跌撞撞地跑进你的视线。",
+                    "你的生活原本像是一潭死水，按部就班，毫无波澜，是{pronoun}的出现，像一颗石子打破了所有的平静。",
+                    "你觉得自己还没有准备好成为谁的依靠，可{pronoun}就那样毫无保留地把自己交到了你手里。"
+                ],
+                middles: [
+                    "为了照顾{pronoun}，你不得不开始规律作息，不得不学会耐心，不得不为了另一个生命去计划未来。",
+                    "{pronoun}带着你重新认识这个世界，路边的小花、清晨的阳光、晚风的味道，因为{pronoun}，这些都被重新赋予了意义。",
+                    "在那些你想要放弃的时刻，是{pronoun}清澈的眼神拉住了你，提醒你还有一份沉甸甸的责任需要背负。"
+                ],
+                endings: [
+                    "你以为是你收养了{pronoun}，其实是{pronoun}牵着你的手，把你领回了温暖的人间。",
+                    "谢谢{pronoun}教会了你什么是责任，什么是爱，以及如何成为一个更好的人。",
+                    "路还很长，但因为有了这个小小的引路人，你开始期待每一个明天的到来。"
+                ]
+            },
+            guardian: { // 时光的守望者
+                openings: [
+                    "你们的故事没有什么波澜壮阔的开场，就是在一个普通的午后，{pronoun}走进了你的生活，从此再没离开。",
+                    "日子平淡如水，你习惯了独来独往，直到家里多了一个会等你回家的身影。",
+                    "起初你只把{pronoun}当成一个宠物，没想过{pronoun}会成为你漫长岁月里最忠诚的卫士。"
+                ],
+                middles: [
+                    "不管是刮风下雨，还是你加班到深夜，只要钥匙转动门锁，迎接你的永远是{pronoun}热切的眼神和摇晃的尾巴。",
+                    "{pronoun}把家守得很好，把你的秘密也守得很好，在这个变幻莫测的世界里，{pronoun}是你唯一确定的永恒。",
+                    "看着{pronoun}趴在脚边熟睡的样子，你会觉得时间仿佛都慢了下来，外面的风雨都与你们无关。"
+                ],
+                endings: [
+                    "所谓岁月静好，不过是因为有一个生命，愿意用{pronoun}的一生，来守护你的每一个日常。",
+                    "在这个流动的世界里，{pronoun}是你永远回得去的岸。",
+                    "谢谢你，我的守望者，替我挡住了时光里所有的荒凉。"
+                ]
+            },
+            ferryman: { // 情绪的摆渡人
+                openings: [
+                    "那段时间你的情绪很糟，像是掉进了一条看不见底的河，是{pronoun}划着小船，轻轻把你托了起来。",
+                    "你习惯了把所有的委屈都憋在心里，直到遇见{pronoun}，你才发现原来眼泪是可以流出来的。",
+                    "{pronoun}来的时候，你正经历着一场悄无声息的崩溃，是{pronoun}的温度让你重新感觉到了活着。"
+                ],
+                middles: [
+                    "每当你难过得说不出话时，{pronoun}总会敏锐地察觉到，然后默默地靠过来，把头轻轻搁在你的膝盖上。",
+                    "{pronoun}就像一块柔软的海绵，无声地吸纳了你所有的负面情绪，却从来不向你抱怨一句。",
+                    "在那些失眠的夜里，是{pronoun}平稳的呼吸声，像摇篮曲一样，哄着你慢慢入睡。"
+                ],
+                endings: [
+                    "是你渡了{pronoun}一程，也是{pronoun}渡了你一生。",
+                    "所有的悲伤终会过去，因为有一个小小的摆渡人，正载着你驶向温暖的彼岸。",
+                    "愿你往后的日子，只有微风拂面，再无风浪侵袭。"
+                ]
+            },
+            companion: { // 宿命的同行者
+                openings: [
+                    "好像是命中注定一样，在那个刚刚好的时间节点，你和{pronoun}就这样自然而然地成为了家人。",
+                    "没有早一步，也没有晚一步，你们在彼此最需要的时候，遇见了对方。",
+                    "你一直觉得自己可以一个人过得很好，直到{pronoun}出现，你才发现原来两个人的生活可以这么有趣。"
+                ],
+                middles: [
+                    "你们一起经历了搬家、换工作、失恋，无论是开心还是难过，{pronoun}始终都在你身边，不离不弃。",
+                    "你已经习惯了做任何计划都把{pronoun}算进去，因为在你的未来里，{pronoun}是不可或缺的一部分。",
+                    "你们像两个默契的老友，在这个偌大的城市里，共享着一份只属于你们的烟火气。"
+                ],
+                endings: [
+                    "这条路很长，幸好有{pronoun}同行，让所有的风景都变得不一样了。",
+                    "你们不是谁依附谁，而是两棵并排生长的树，根在地下交织，叶在云里相触。",
+                    "这一生能与{pronoun}同行，是命运给你最好的礼物。"
+                ]
+            }
+        };
+
+        // 页面跳转
+        function goToPage(pageId) {
+            const current = document.querySelector('.page.active');
+            const next = document.getElementById(pageId);
+            
+            if (current) {
+                current.classList.remove('active');
+                setTimeout(() => {
+                    next.classList.add('active');
+                }, 800); // 等待淡出
+            } else {
+                next.classList.add('active');
+            }
+        }
+
+        // 选项选择
+        function selectOption(category, element, value) {
+            // 清除同类高亮
+            const siblings = element.parentElement.children;
+            for (let el of siblings) {
+                el.classList.remove('selected');
+            }
+            // 选中当前
+            element.classList.add('selected');
+            
+            // 更新状态
+            if (category === 'owner-status') state.ownerStatus = value;
+            if (category === 'pet-type') state.petType = value;
+            if (category === 'pet-feeling') state.petFeeling = value;
+            if (category === 'pet-gender') state.petGender = value;
+            if (category === 'pet-status') state.petStatus = value;
+        }
+
+        // 生成结果
+        function generateResult() {
+            // 简单校验
+            const dob = document.getElementById('owner-dob').value;
+            const arrival = document.getElementById('pet-arrival').value;
+            const name = document.getElementById('pet-name').value.trim();
+            
+            if (!dob || !arrival || !name || !state.ownerStatus || !state.petType || !state.petFeeling || !state.petGender || !state.petStatus) {
+                alert("请填写完整信息，以便我们连接这段宿命。");
+                return;
+            }
+
+            state.ownerDob = dob;
+            state.petArrival = arrival;
+            state.petName = name;
+
+            // 显示 Loading
+            const current = document.querySelector('.page.active');
+            current.classList.remove('active');
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+
+            // 模拟计算延迟
+            setTimeout(() => {
+                calculateDestiny();
+                loader.style.display = 'none';
+                
+                const resultPage = document.getElementById('page-result');
+                resultPage.classList.add('active');
+                
+                // 结果卡片动画
+                setTimeout(() => {
+                    document.getElementById('result-card').classList.add('visible');
+                }, 100);
+
+                // 底部文字延迟
+                setTimeout(() => {
+                    document.getElementById('footer-msg').classList.add('visible');
+                }, 3000);
+
+                // 按钮延迟
+                setTimeout(() => {
+                    document.getElementById('result-btns').style.opacity = '1';
+                }, 4000);
+
+            }, 2000);
+        }
+
+        // 生成平行世界故事（或彩虹桥回忆）
+        function generateParallelStory() {
+            // 根据宠物状态选择故事模板库
+            const isRainbow = state.petStatus === 'rainbow';
+            const templateSource = isRainbow ? rainbowStoryTemplates : storyTemplates;
+
+            if (!state.currentArchetypeId || !templateSource[state.currentArchetypeId]) return;
+
+            const template = templateSource[state.currentArchetypeId];
+            const pronoun = state.petGender === 'boy' ? '他' : '她';
+            const name = state.petName;
+
+            // 随机选择片段
+            const opening = template.openings[Math.floor(Math.random() * template.openings.length)];
+            const middle = template.middles[Math.floor(Math.random() * template.middles.length)];
+            const ending = template.endings[Math.floor(Math.random() * template.endings.length)];
+
+            // 组合并替换
+            let story = `${opening}\n\n${middle}\n\n${ending}`;
+            story = story.replace(/{pronoun}/g, pronoun).replace(/{name}/g, name);
+
+            // 渲染
+            const storyCard = document.getElementById('story-card');
+            const storyContent = document.getElementById('story-content');
+            const storyTitle = storyCard.querySelector('.result-title');
+            const btnStory = document.getElementById('btn-story');
+
+            // 根据模式调整标题
+            if (isRainbow) {
+                storyTitle.innerText = `与${name}的珍贵回忆`;
+                storyCard.style.borderLeft = '3px solid #b8a9c9';
+            } else {
+                storyTitle.innerText = '一段属于你们的小故事';
+                storyCard.style.borderLeft = '3px solid var(--text-color)';
+            }
+
+            // 显示故事内容
+            storyContent.innerText = story;
+            
+            // 显示卡片
+            storyCard.style.display = 'block';
+            // 强制重绘
+            void storyCard.offsetWidth;
+            storyCard.classList.add('visible');
+            storyCard.style.opacity = '1';
+            storyCard.style.transform = 'translateY(0)';
+
+            // 隐藏按钮
+            btnStory.style.display = 'none';
+            
+            // 滚动到故事卡片
+            setTimeout(() => {
+                storyCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        // 核心算法（伪随机 + 权重）
+        function calculateDestiny() {
+            // 初始化分值
+            let scores = {
+                healer: 0,
+                mirror: 0,
+                guide: 0,
+                guardian: 0,
+                ferryman: 0,
+                companion: 0
+            };
+
+            // 1. 根据主人状态加权
+            switch(state.ownerStatus) {
+                case 'stress': 
+                    scores.healer += 3; 
+                    scores.ferryman += 2; 
+                    break;
+                case 'recovering': 
+                    scores.healer += 2; 
+                    scores.companion += 2; 
+                    break;
+                case 'stable': 
+                    scores.guardian += 3; 
+                    scores.companion += 1; 
+                    break;
+                case 'changing': 
+                    scores.guide += 3; 
+                    scores.mirror += 2; 
+                    break;
+                case 'lonely':
+                    scores.companion += 3;
+                    scores.mirror += 2;
+                    break;
+                case 'loss':
+                    scores.ferryman += 3;
+                    scores.healer += 2;
+                    break;
+                case 'confused':
+                    scores.guide += 3;
+                    scores.healer += 1;
+                    break;
+                case 'grateful':
+                    scores.guardian += 2;
+                    scores.companion += 2;
+                    break;
+            }
+
+            // 2. 根据第一感觉加权
+            switch(state.petFeeling) {
+                case 'soft': 
+                    scores.ferryman += 3; 
+                    scores.healer += 1; 
+                    break;
+                case 'healed': 
+                    scores.healer += 3; 
+                    scores.companion += 1; 
+                    break;
+                case 'responsibility': 
+                    scores.guide += 2; 
+                    scores.guardian += 2; 
+                    break;
+                case 'attached': 
+                    scores.mirror += 3; 
+                    scores.companion += 1; 
+                    break;
+                case 'unknown': 
+                    scores.mirror += 2; 
+                    scores.guide += 1; 
+                    break;
+                case 'needed':
+                    scores.ferryman += 2;
+                    scores.companion += 2;
+                    break;
+                case 'safe':
+                    scores.guardian += 3;
+                    scores.healer += 1;
+                    break;
+                case 'seen':
+                    scores.mirror += 3;
+                    scores.healer += 1;
+                    break;
+                case 'family':
+                    scores.companion += 3;
+                    scores.guardian += 1;
+                    break;
+            }
+
+            // 3. 根据宠物类型加权 (新增)
+            switch(state.petType) {
+                case 'cat': scores.mirror += 1.5; scores.healer += 1; break;
+                case 'dog': scores.companion += 1.5; scores.guardian += 1; break;
+                case 'other': scores.guide += 1; scores.ferryman += 1; break;
+            }
+
+            // 4. 根据相处时间加权 (新增)
+            const arrivalDate = new Date(state.petArrival);
+            const now = new Date();
+            const diffYears = (now - arrivalDate) / (1000 * 60 * 60 * 24 * 365);
+            
+            if (diffYears < 1) {
+                // 相处时间短 -> 往往是带着某种任务来的
+                scores.guide += 1;
+                scores.ferryman += 1;
+            } else if (diffYears > 5) {
+                // 相处时间长 -> 守护与陪伴
+                scores.guardian += 2;
+                scores.companion += 2;
+            } else {
+                // 中间阶段
+                scores.mirror += 1;
+                scores.healer += 1;
+            }
+
+            // 5. 增加更显著的随机因子 (0-3.5) 并引入生日扰动
+            // 使用生日计算一个固定的“命运偏移值”，让同一个人在不同时间测有一定的一致性，但又不会完全死板
+            const dob = new Date(state.ownerDob);
+            const fateSeed = (dob.getDate() + dob.getMonth()) % 6; // 0-5
+            
+            // 给特定的 archetype 增加一点“本命”分
+            const keys = Object.keys(scores);
+            scores[keys[fateSeed]] += 1.5;
+
+            // 纯随机扰动，打破平局
+            for (let key in scores) {
+                scores[key] += Math.random() * 3.5;
+            }
+
+            const T = 1.2;
+            const keysOrder = Object.keys(scores);
+            const exps = keysOrder.map(k => Math.exp(scores[k] / T));
+            const totalExp = exps.reduce((a,b)=>a+b,0);
+            let r = Math.random() * totalExp;
+            let selectedId = keysOrder[0];
+            for (let i=0;i<keysOrder.length;i++) {
+                r -= exps[i];
+                if (r <= 0) { selectedId = keysOrder[i]; break; }
+            }
+            try {
+                const last = localStorage.getItem('lastArchetype');
+                if (last === selectedId) {
+                    const sortedIdx = exps.map((v,i)=>({v,i})).sort((a,b)=>b.v - a.v);
+                    const second = keysOrder[sortedIdx[1]?.i];
+                    if (second && Math.random() < 0.4) selectedId = second;
+                }
+                localStorage.setItem('lastArchetype', selectedId);
+            } catch(e) {}
+
+            // 根据宠物状态选择文案库
+            const isRainbow = state.petStatus === 'rainbow';
+            const archetypeSource = isRainbow ? rainbowArchetypes : archetypes;
+            const result = archetypeSource.find(a => a.id === selectedId);
+
+            // 存储当前宿命原型ID
+            state.currentArchetypeId = selectedId;
+            
+            // 处理文本替换 (名字 & 性别)
+            const pronoun = state.petGender === 'boy' ? '他' : '她';
+            const name = state.petName;
+
+            // 替换函数
+            const processText = (text) => {
+                // 将所有 "它" 替换为 "他" 或 "她"
+                let processed = text.replace(/它/g, pronoun);
+                // 偶尔将开头的代词替换为名字（这里简单处理：替换文案中的占位符，或者直接把第一句话的主语换成名字）
+                // 为了效果自然，我们不在原文中硬塞，而是通过标题强化名字
+                return processed;
+            };
+
+            // 渲染 DOM
+            document.getElementById('res-title').innerText = result.title;
+            
+            // 优化标题展示
+            document.querySelectorAll('.result-section .result-label').forEach((el, index) => {
+                if (index === 0) el.innerText = `与 ${name} 相遇的意义`;
+                if (index === 1) el.innerText = `${name} 在你生命中的角色`;
+                if (index === 2) el.innerText = `给你们最重要的提醒`;
+                if (index === 3) el.innerText = `${name} 想对你说的话`;
+                if (index === 4) el.innerText = `${name} 的幸运颜色`;
+            });
+
+            document.getElementById('res-meaning').innerText = processText(result.meaning);
+            document.getElementById('res-role').innerText = processText(result.role);
+            document.getElementById('res-reminder').innerText = processText(result.reminder);
+            document.getElementById('res-message').innerText = processText(result.message);
+            document.getElementById('res-color').innerText = result.luckyColor;
+            
+            // 底部文案
+            if (isRainbow) {
+                document.getElementById('footer-msg').innerHTML = `"你们的故事没有结束，只是换了一种方式继续。在彩虹桥的那一边，${pronoun}依然爱着你。"`;
+            } else {
+                document.getElementById('footer-msg').innerHTML = `"${pronoun}不是为了被你拥有，而是为了陪你走过这一段。"`;
+            }
+
+            // 彩虹桥模式添加特殊样式
+            const resultCard = document.getElementById('result-card');
+            const btnStory = document.getElementById('btn-story');
+            const btnSummary = document.getElementById('btn-summary');
+
+            if (isRainbow) {
+                resultCard.style.borderTop = '3px solid #b8a9c9';
+                document.getElementById('page-result').classList.add('rainbow-mode');
+                btnStory.innerText = `回忆与${name}的故事`;
+                btnSummary.innerText = '生成纪念卡片';
+            } else {
+                resultCard.style.borderTop = 'none';
+                document.getElementById('page-result').classList.remove('rainbow-mode');
+                btnStory.innerText = '查看平行世界里我们的故事';
+                btnSummary.innerText = '生成我的宿命总结';
+            }
+        }
+
+        // 重新开始
+        function restart() {
+            // 重置 UI
+            document.getElementById('result-card').classList.remove('visible');
+            document.getElementById('result-card').style.borderTop = 'none';
+            document.getElementById('footer-msg').classList.remove('visible');
+            document.getElementById('result-btns').style.opacity = '0';
+            document.getElementById('page-result').classList.remove('rainbow-mode');
+
+            // 重置故事卡片
+            const storyCard = document.getElementById('story-card');
+            storyCard.style.display = 'none';
+            storyCard.style.opacity = '0';
+            storyCard.classList.remove('visible');
+            document.getElementById('btn-story').style.display = 'inline-block'; // 恢复按钮显示
+
+            // 重置按钮文案
+            document.getElementById('btn-story').innerText = '查看平行世界里我们的故事';
+            document.getElementById('btn-summary').innerText = '生成我的宿命总结';
+
+            // 清空表单数据（可选，这里选择保留部分方便重测，或者全部清空）
+            // state 重置略
+
+            goToPage('page-intro');
+        }
+
+        // 生成总结 (简单的 alert 模拟或 UI 变化，这里做一个全屏卡片覆盖)
+        function showSummary() {
+            const title = document.getElementById('res-title').innerText;
+            const isRainbow = state.petStatus === 'rainbow';
+            const pronoun = state.petGender === 'boy' ? '他' : '她';
+
+            // 根据模式设置不同的样式和文案
+            const bgColor = isRainbow ? 'linear-gradient(180deg, #faf8fc 0%, #f5f0f7 100%)' : '#fcfbf9';
+            const borderColor = isRainbow ? '#b8a9c9' : '#333';
+            const titleColor = isRainbow ? '#8b7a9e' : '#333';
+            const subtitle = isRainbow
+                ? `永远怀念 ${state.petName}`
+                : `我和 ${state.petName} 的宿命关系`;
+            const quote = isRainbow
+                ? `"你们的故事没有结束，<br>只是换了一种方式继续。<br>在彩虹桥那边，${pronoun}依然爱着你。"`
+                : `"${pronoun}不是为了被你拥有，<br>而是为了陪你走过这一段。"`;
+
+            const bg = document.createElement('div');
+            bg.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: ${bgColor}; z-index: 100; display: flex;
+                flex-direction: column; justify-content: center; align-items: center;
+                padding: 40px; text-align: center;
+            `;
+
+            bg.innerHTML = `
+                <div style="border: 1px solid ${borderColor}; padding: 40px 20px; max-width: 320px; background: #fff; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                    <p style="font-size: 12px; color: #888; margin-bottom: 20px; letter-spacing: 2px;">${subtitle}</p>
+                    <h2 style="font-size: 24px; margin-bottom: 30px; letter-spacing: 3px; color: ${titleColor};">${title}</h2>
+                    <p style="font-size: 14px; line-height: 1.8; color: #555;">${quote}</p>
+                    <div style="margin-top: 40px; width: 40px; height: 1px; background: #ccc; margin-left: auto; margin-right: auto;"></div>
+                </div>
+                <p style="margin-top: 20px; font-size: 12px; color: #aaa;">长按截图保存</p>
+                <button onclick="this.parentElement.remove()" style="margin-top: 30px; background: none; border: none; font-size: 24px; cursor: pointer; color: ${titleColor};">×</button>
+            `;
+
+            document.body.appendChild(bg);
+        }
+
+    </script>
+</body>
+</html>
