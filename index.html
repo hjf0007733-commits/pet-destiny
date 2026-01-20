@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>宠物与主人的宿命关系</title>
+    <title>宠物命理馆 - 探索你与毛孩子的缘分</title>
     <style>
         :root {
             --bg-color: #fcfbf9;
@@ -307,6 +307,105 @@
             .result-card { padding: 30px 20px; }
         }
 
+        /* 主菜单样式 */
+        .menu-title {
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .menu-subtitle {
+            font-size: 14px;
+            color: var(--sub-text-color);
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+            padding: 0 10px;
+        }
+
+        .menu-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border-color: var(--text-color);
+        }
+
+        .menu-card-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .menu-card-title {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-color);
+            letter-spacing: 1px;
+        }
+
+        .menu-card-desc {
+            font-size: 12px;
+            color: var(--sub-text-color);
+            line-height: 1.5;
+        }
+
+        .menu-card.featured {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #f8f6f4 0%, #fff 100%);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-color);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .back-btn:hover {
+            background: var(--text-color);
+            color: white;
+        }
+
         /* 彩虹桥模式特殊样式 */
         .rainbow-mode {
             background: linear-gradient(180deg, #faf8fc 0%, #f5f0f7 100%);
@@ -339,7 +438,10 @@
 <body>
 
     <div class="container">
-        
+
+        <!-- 返回按钮 -->
+        <button class="back-btn" id="back-btn" onclick="goToMenu()">←</button>
+
         <!-- Loading -->
         <div class="loader" id="loader">
             <div class="loader-dot"></div>
@@ -347,8 +449,58 @@
             <div class="loader-dot"></div>
         </div>
 
-        <!-- 1. 进入页 -->
-        <div class="page active" id="page-intro">
+        <!-- 0. 主菜单 -->
+        <div class="page active" id="page-menu">
+            <h1 class="menu-title">宠物命理馆</h1>
+            <p class="menu-subtitle">探索你与毛孩子的神秘缘分</p>
+
+            <div class="menu-grid">
+                <div class="menu-card featured" onclick="startFeature('destiny')">
+                    <div class="menu-card-icon">🔮</div>
+                    <div class="menu-card-title">宿命关系</div>
+                    <div class="menu-card-desc">它为什么会来到你身边？解读你们的命定羁绊</div>
+                </div>
+
+                <div class="menu-card" onclick="startFeature('zodiac')">
+                    <div class="menu-card-icon">⭐</div>
+                    <div class="menu-card-title">宠物星座</div>
+                    <div class="menu-card-desc">TA的星座性格</div>
+                </div>
+
+                <div class="menu-card" onclick="startFeature('compatibility')">
+                    <div class="menu-card-icon">💕</div>
+                    <div class="menu-card-title">主宠配对</div>
+                    <div class="menu-card-desc">你们的契合指数</div>
+                </div>
+
+                <div class="menu-card" onclick="startFeature('weekly')">
+                    <div class="menu-card-icon">📅</div>
+                    <div class="menu-card-title">本周运势</div>
+                    <div class="menu-card-desc">TA这周运气如何</div>
+                </div>
+
+                <div class="menu-card" onclick="startFeature('pastlife')">
+                    <div class="menu-card-icon">🌙</div>
+                    <div class="menu-card-title">前世今生</div>
+                    <div class="menu-card-desc">TA上辈子是谁</div>
+                </div>
+
+                <div class="menu-card" onclick="startFeature('lucky')">
+                    <div class="menu-card-icon">🍀</div>
+                    <div class="menu-card-title">今日幸运</div>
+                    <div class="menu-card-desc">幸运色与幸运日</div>
+                </div>
+
+                <div class="menu-card" onclick="startFeature('rainbow')">
+                    <div class="menu-card-icon">🌈</div>
+                    <div class="menu-card-title">彩虹桥</div>
+                    <div class="menu-card-desc">纪念已离开的TA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 宿命关系进入页 -->
+        <div class="page" id="page-intro">
             <h1>它不是随机来到你身边的。</h1>
             <p class="sub-text">有些相遇，是为了完成一段关系。</p>
             <button class="btn" onclick="goToPage('page-form')">开始解读我和 TA 的宿命</button>
@@ -479,6 +631,246 @@
                 <button class="btn" id="btn-story" onclick="generateParallelStory()">查看平行世界里我们的故事</button>
                 <button class="btn" id="btn-summary" onclick="showSummary()">生成我的宿命总结</button>
                 <button class="btn" onclick="restart()">重新解读一次</button>
+            </div>
+        </div>
+
+        <!-- 宠物星座页面 -->
+        <div class="page" id="page-zodiac">
+            <div class="form-container">
+                <h1 style="margin-bottom: 30px;">宠物星座分析</h1>
+                <div class="form-group">
+                    <label class="form-label">TA 的名字</label>
+                    <input type="text" class="form-input" id="zodiac-pet-name" placeholder="" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 的生日</label>
+                    <input type="date" class="form-input" id="zodiac-pet-dob">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 是</label>
+                    <div class="options-grid" id="zodiac-pet-type">
+                        <div class="option-tag" onclick="selectOption('zodiac-type', this, 'cat')">猫</div>
+                        <div class="option-tag" onclick="selectOption('zodiac-type', this, 'dog')">狗</div>
+                        <div class="option-tag" onclick="selectOption('zodiac-type', this, 'other')">其他</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="generateZodiac()">查看TA的星座性格</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 宠物星座结果页 -->
+        <div class="page" id="page-zodiac-result">
+            <div class="result-card" id="zodiac-result-card">
+                <h2 class="result-title" id="zodiac-title"></h2>
+                <div class="result-section">
+                    <span class="result-label">星座性格</span>
+                    <p class="result-text" id="zodiac-personality"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">隐藏特质</span>
+                    <p class="result-text" id="zodiac-trait"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">相处建议</span>
+                    <p class="result-text" id="zodiac-advice"></p>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="goToMenu()">返回首页</button>
+            </div>
+        </div>
+
+        <!-- 主宠配对页面 -->
+        <div class="page" id="page-compatibility">
+            <div class="form-container">
+                <h1 style="margin-bottom: 30px;">主宠契合度</h1>
+                <div class="form-group">
+                    <label class="form-label">你的生日</label>
+                    <input type="date" class="form-input" id="compat-owner-dob">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 的名字</label>
+                    <input type="text" class="form-input" id="compat-pet-name" placeholder="" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 的生日</label>
+                    <input type="date" class="form-input" id="compat-pet-dob">
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="generateCompatibility()">计算契合度</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主宠配对结果页 -->
+        <div class="page" id="page-compatibility-result">
+            <div class="result-card">
+                <h2 class="result-title" id="compat-title"></h2>
+                <div style="text-align: center; margin: 30px 0;">
+                    <div style="font-size: 64px; font-weight: 300; color: #333;" id="compat-score"></div>
+                    <div style="font-size: 14px; color: #888; margin-top: 10px;">契合指数</div>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">配对解读</span>
+                    <p class="result-text" id="compat-reading"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">相处秘诀</span>
+                    <p class="result-text" id="compat-tips"></p>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="goToMenu()">返回首页</button>
+            </div>
+        </div>
+
+        <!-- 本周运势页面 -->
+        <div class="page" id="page-weekly">
+            <div class="form-container">
+                <h1 style="margin-bottom: 30px;">本周运势</h1>
+                <div class="form-group">
+                    <label class="form-label">TA 的名字</label>
+                    <input type="text" class="form-input" id="weekly-pet-name" placeholder="" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 的生日</label>
+                    <input type="date" class="form-input" id="weekly-pet-dob">
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="generateWeekly()">查看本周运势</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 本周运势结果页 -->
+        <div class="page" id="page-weekly-result">
+            <div class="result-card">
+                <h2 class="result-title" id="weekly-title"></h2>
+                <div class="result-section">
+                    <span class="result-label">整体运势</span>
+                    <p class="result-text" id="weekly-overall"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">健康提醒</span>
+                    <p class="result-text" id="weekly-health"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">本周宜忌</span>
+                    <p class="result-text" id="weekly-dos"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">幸运时刻</span>
+                    <p class="result-text" id="weekly-lucky"></p>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="goToMenu()">返回首页</button>
+            </div>
+        </div>
+
+        <!-- 前世今生页面 -->
+        <div class="page" id="page-pastlife">
+            <div class="form-container">
+                <h1 style="margin-bottom: 30px;">前世今生</h1>
+                <div class="form-group">
+                    <label class="form-label">TA 的名字</label>
+                    <input type="text" class="form-input" id="pastlife-pet-name" placeholder="" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 是</label>
+                    <div class="options-grid" id="pastlife-pet-type">
+                        <div class="option-tag" onclick="selectOption('pastlife-type', this, 'cat')">猫</div>
+                        <div class="option-tag" onclick="selectOption('pastlife-type', this, 'dog')">狗</div>
+                        <div class="option-tag" onclick="selectOption('pastlife-type', this, 'other')">其他</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 给你的第一印象</label>
+                    <div class="options-grid" id="pastlife-feeling">
+                        <div class="option-tag" onclick="selectOption('pastlife-feel', this, 'familiar')">似曾相识</div>
+                        <div class="option-tag" onclick="selectOption('pastlife-feel', this, 'destined')">命中注定</div>
+                        <div class="option-tag" onclick="selectOption('pastlife-feel', this, 'protective')">想保护TA</div>
+                        <div class="option-tag" onclick="selectOption('pastlife-feel', this, 'peaceful')">很安心</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="generatePastlife()">揭开前世记忆</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 前世今生结果页 -->
+        <div class="page" id="page-pastlife-result">
+            <div class="result-card">
+                <h2 class="result-title" id="pastlife-title"></h2>
+                <div class="result-section">
+                    <span class="result-label">前世身份</span>
+                    <p class="result-text" id="pastlife-identity"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">前世故事</span>
+                    <p class="result-text" id="pastlife-story"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">今生使命</span>
+                    <p class="result-text" id="pastlife-mission"></p>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="goToMenu()">返回首页</button>
+            </div>
+        </div>
+
+        <!-- 今日幸运页面 -->
+        <div class="page" id="page-lucky">
+            <div class="form-container">
+                <h1 style="margin-bottom: 30px;">今日幸运</h1>
+                <div class="form-group">
+                    <label class="form-label">TA 的名字</label>
+                    <input type="text" class="form-input" id="lucky-pet-name" placeholder="" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TA 的生日</label>
+                    <input type="date" class="form-input" id="lucky-pet-dob">
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="generateLucky()">查看今日幸运</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日幸运结果页 -->
+        <div class="page" id="page-lucky-result">
+            <div class="result-card">
+                <h2 class="result-title" id="lucky-title"></h2>
+                <div style="display: flex; justify-content: space-around; margin: 30px 0; text-align: center;">
+                    <div>
+                        <div style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px;" id="lucky-color-box"></div>
+                        <div style="font-size: 12px; color: #888;">幸运颜色</div>
+                        <div style="font-size: 14px; margin-top: 5px;" id="lucky-color-name"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 36px; margin-bottom: 10px;" id="lucky-number"></div>
+                        <div style="font-size: 12px; color: #888;">幸运数字</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 36px; margin-bottom: 10px;" id="lucky-direction"></div>
+                        <div style="font-size: 12px; color: #888;">幸运方位</div>
+                    </div>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">今日运势</span>
+                    <p class="result-text" id="lucky-fortune"></p>
+                </div>
+                <div class="result-section">
+                    <span class="result-label">今日建议</span>
+                    <p class="result-text" id="lucky-suggestion"></p>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="goToMenu()">返回首页</button>
             </div>
         </div>
 
@@ -1239,6 +1631,299 @@
 
             document.body.appendChild(bg);
         }
+
+        // ========== 新功能：菜单和导航 ==========
+        let currentFeature = '';
+
+        function startFeature(feature) {
+            currentFeature = feature;
+            document.getElementById('back-btn').classList.add('visible');
+
+            switch(feature) {
+                case 'destiny':
+                    goToPage('page-intro');
+                    break;
+                case 'zodiac':
+                    goToPage('page-zodiac');
+                    break;
+                case 'compatibility':
+                    goToPage('page-compatibility');
+                    break;
+                case 'weekly':
+                    goToPage('page-weekly');
+                    break;
+                case 'pastlife':
+                    goToPage('page-pastlife');
+                    break;
+                case 'lucky':
+                    goToPage('page-lucky');
+                    break;
+                case 'rainbow':
+                    // 直接进入宿命关系，预选彩虹桥
+                    goToPage('page-intro');
+                    break;
+            }
+        }
+
+        function goToMenu() {
+            document.getElementById('back-btn').classList.remove('visible');
+            goToPage('page-menu');
+        }
+
+        // ========== 星座数据 ==========
+        const zodiacData = {
+            aries: { name: '白羊座', icon: '♈', personality: '充满活力、好奇心旺盛，是个小冒险家。喜欢追逐、奔跑，对新事物总是第一个冲上去。', trait: '看似无所畏惧，其实内心渴望你的认可。当它安静下来盯着你看时，是在确认你还爱它。', advice: '多陪它玩耍，消耗它旺盛的精力。当它犯傻时别太严厉，它只是太兴奋了。' },
+            taurus: { name: '金牛座', icon: '♉', personality: '慢热、固执，但一旦认定你就是一辈子。喜欢舒适的窝和固定的作息。', trait: '表面淡定，其实非常在意你的陪伴。如果你改变了它的习惯，它会用沉默表达不满。', advice: '给它稳定的环境和规律的生活。它不喜欢变化，搬家或换粮时要循序渐进。' },
+            gemini: { name: '双子座', icon: '♊', personality: '聪明、多变，情绪来得快去得也快。今天黏你明天可能理都不理。', trait: '它需要足够的刺激和新鲜感。如果表现得无聊或搞破坏，说明它需要更多互动了。', advice: '多准备不同的玩具，经常变换游戏方式。和它说话，它能听懂你的语气。' },
+            cancer: { name: '巨蟹座', icon: '♋', personality: '敏感、念家，是个小粘人精。最喜欢窝在你身边，对家人有强烈的保护欲。', trait: '它能敏锐感知你的情绪变化。当你难过时，它会默默靠近你。', advice: '给它足够的安全感，避免长时间独处。它需要被需要的感觉。' },
+            leo: { name: '狮子座', icon: '♌', personality: '骄傲、自信，天生的小主子。喜欢被关注、被赞美，是家里的小太阳。', trait: '看起来高傲，其实最怕被忽视。如果你冷落它，它会用各种方式吸引你的注意。', advice: '多夸夸它，让它感觉自己是最棒的。它需要成为你眼中的焦点。' },
+            virgo: { name: '处女座', icon: '♍', personality: '爱干净、挑剔，有自己的小洁癖。对环境和食物都有较高要求。', trait: '它比你想象的更敏感。任何微小的变化都逃不过它的眼睛。', advice: '保持环境整洁，定期清洁它的用品。它会用自己的方式回报你的细心。' },
+            libra: { name: '天秤座', icon: '♎', personality: '温和、优雅，是个小外交家。不喜欢冲突，总是试图讨好每个人。', trait: '它害怕做选择，也害怕让你失望。当面对陌生人或新环境时会显得犹豫。', advice: '给它和谐的家庭氛围。避免在它面前争吵，它会为此感到不安。' },
+            scorpio: { name: '天蝎座', icon: '♏', personality: '神秘、专一，爱恨分明。对你的忠诚度极高，但也记仇。', trait: '它的眼神里藏着深不可测的情感。一旦信任你，就是毫无保留的依赖。', advice: '不要背叛它的信任。它需要时间来接受新事物，但一旦接受就是永远。' },
+            sagittarius: { name: '射手座', icon: '♐', personality: '自由、乐观，是个小探险家。渴望探索，不喜欢被限制。', trait: '它的快乐很简单，一次出门、一个新玩具就能让它开心很久。', advice: '给它足够的活动空间和探索机会。它需要自由，但也需要你作为安全的港湾。' },
+            capricorn: { name: '摩羯座', icon: '♑', personality: '沉稳、独立，是个小老灵魂。不需要太多关注，自己也能过得很好。', trait: '看似高冷，其实非常忠诚。它用行动而不是撒娇来表达爱。', advice: '尊重它的独立空间，但别忘了定期给它一些专属的相处时间。' },
+            aquarius: { name: '水瓶座', icon: '♒', personality: '古怪、独特，总是做一些让人看不懂的事。有自己的想法和节奏。', trait: '它不按常理出牌，但这正是它独特的魅力。它需要你接受它的与众不同。', advice: '不要试图改变它的怪癖。欣赏它的独特性，你会发现一个有趣的灵魂。' },
+            pisces: { name: '双鱼座', icon: '♓', personality: '敏感、温柔，是个小梦想家。容易受环境影响，需要很多爱和安全感。', trait: '它像一块情绪海绵，会吸收你的喜怒哀乐。你的状态直接影响它的状态。', advice: '给它一个平和的环境。多抱抱它，让它感受到无条件的爱。' }
+        };
+
+        function getZodiac(dateStr) {
+            const date = new Date(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return 'aries';
+            if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return 'taurus';
+            if ((month == 5 && day >= 21) || (month == 6 && day <= 21)) return 'gemini';
+            if ((month == 6 && day >= 22) || (month == 7 && day <= 22)) return 'cancer';
+            if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return 'leo';
+            if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return 'virgo';
+            if ((month == 9 && day >= 23) || (month == 10 && day <= 23)) return 'libra';
+            if ((month == 10 && day >= 24) || (month == 11 && day <= 22)) return 'scorpio';
+            if ((month == 11 && day >= 23) || (month == 12 && day <= 21)) return 'sagittarius';
+            if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return 'capricorn';
+            if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return 'aquarius';
+            return 'pisces';
+        }
+
+        function generateZodiac() {
+            const name = document.getElementById('zodiac-pet-name').value.trim();
+            const dob = document.getElementById('zodiac-pet-dob').value;
+            if (!name || !dob) {
+                alert('请填写完整信息');
+                return;
+            }
+            const zodiacKey = getZodiac(dob);
+            const data = zodiacData[zodiacKey];
+            document.getElementById('zodiac-title').innerText = `${name} · ${data.icon} ${data.name}`;
+            document.getElementById('zodiac-personality').innerText = data.personality;
+            document.getElementById('zodiac-trait').innerText = data.trait;
+            document.getElementById('zodiac-advice').innerText = data.advice;
+            goToPage('page-zodiac-result');
+        }
+
+        // ========== 主宠配对 ==========
+        const compatibilityTexts = {
+            high: ['你们是天生的灵魂伴侣！宇宙早就安排好了这次相遇。', '命中注定的缘分，彼此都是对方生命中最重要的存在。', '你们之间有着不可思议的默契，仿佛前世就是一家人。'],
+            medium: ['你们的缘分需要时间来培养，但会越来越深厚。', '虽然偶有小摩擦，但这正是让关系更牢固的调味剂。', '你们互补的性格，让彼此都成为更好的自己。'],
+            low: ['你们的相遇是为了彼此学习和成长。', '看似不那么契合，但正因如此，你们能给彼此带来全新的视角。', '缘分不在于完美匹配，而在于愿意为对方改变。']
+        };
+
+        const compatibilityTips = [
+            '多一点耐心，少一点期待。它已经把最好的自己给了你。',
+            '每天抽出专属的相处时间，哪怕只有五分钟。',
+            '学会读懂它的肢体语言，它一直在用自己的方式和你说话。',
+            '偶尔的小惊喜，比如新玩具或者零食，能让它开心很久。',
+            '它犯错时别太严厉，它可能只是在用自己的方式爱你。'
+        ];
+
+        function generateCompatibility() {
+            const ownerDob = document.getElementById('compat-owner-dob').value;
+            const petName = document.getElementById('compat-pet-name').value.trim();
+            const petDob = document.getElementById('compat-pet-dob').value;
+            if (!ownerDob || !petName || !petDob) {
+                alert('请填写完整信息');
+                return;
+            }
+            const ownerZodiac = getZodiac(ownerDob);
+            const petZodiac = getZodiac(petDob);
+            // 简单的契合度算法
+            let baseScore = 70 + Math.floor(Math.random() * 20);
+            const zodiacBonus = Math.abs(ownerZodiac.charCodeAt(0) - petZodiac.charCodeAt(0)) % 15;
+            baseScore = Math.min(99, baseScore + zodiacBonus);
+
+            let level = 'medium';
+            if (baseScore >= 90) level = 'high';
+            else if (baseScore < 75) level = 'low';
+
+            const texts = compatibilityTexts[level];
+            const reading = texts[Math.floor(Math.random() * texts.length)];
+            const tip = compatibilityTips[Math.floor(Math.random() * compatibilityTips.length)];
+
+            document.getElementById('compat-title').innerText = `你 & ${petName}`;
+            document.getElementById('compat-score').innerText = baseScore + '%';
+            document.getElementById('compat-reading').innerText = reading;
+            document.getElementById('compat-tips').innerText = tip;
+            goToPage('page-compatibility-result');
+        }
+
+        // ========== 本周运势 ==========
+        const weeklyOverall = [
+            '本周整体运势不错，适合尝试新事物。可能会有意想不到的小惊喜等着TA。',
+            '平稳的一周，适合休息和恢复。保持日常节奏就是最好的安排。',
+            '本周活力满满！TA可能会比平时更活跃，需要更多的互动和陪伴。',
+            '本周可能会有点小敏感，需要你多一些耐心和关爱。',
+            '运势上升中！本周是建立更深羁绊的好时机。'
+        ];
+
+        const weeklyHealth = [
+            '注意饮食规律，避免喂食过多零食。保持充足的饮水。',
+            '本周适合多晒晒太阳，有助于TA的心情和健康。',
+            '留意TA的睡眠质量，一个舒适的休息环境很重要。',
+            '适当增加运动量，帮助TA保持健康的体态。',
+            '注意保暖，季节变化时要特别留意TA的状态。'
+        ];
+
+        const weeklyDos = [
+            '宜：玩耍、探索、社交 | 忌：长时间独处、换粮',
+            '宜：休息、陪伴、安静的活动 | 忌：过度刺激、陌生环境',
+            '宜：户外活动、学习新技能 | 忌：打扰TA的睡眠',
+            '宜：按摩、梳毛、亲密接触 | 忌：突然的惊吓',
+            '宜：拍照留念、尝试新玩具 | 忌：长时间旅行'
+        ];
+
+        const weeklyLucky = [
+            '周三下午，阳光正好的时刻，是你们相处的黄金时间。',
+            '周末的清晨，TA的心情会特别好，适合一起度过慵懒时光。',
+            '周四傍晚，可能会有一个特别温馨的瞬间等着你们。',
+            '周二的午后，TA可能会用特别的方式表达对你的爱。',
+            '周五晚上，适合和TA来一次深度的眼神交流。'
+        ];
+
+        function generateWeekly() {
+            const name = document.getElementById('weekly-pet-name').value.trim();
+            const dob = document.getElementById('weekly-pet-dob').value;
+            if (!name || !dob) {
+                alert('请填写完整信息');
+                return;
+            }
+            const weekNum = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+            const seed = dob.split('-').reduce((a, b) => a + parseInt(b), 0) + weekNum;
+
+            document.getElementById('weekly-title').innerText = `${name} 的本周运势`;
+            document.getElementById('weekly-overall').innerText = weeklyOverall[seed % weeklyOverall.length];
+            document.getElementById('weekly-health').innerText = weeklyHealth[seed % weeklyHealth.length];
+            document.getElementById('weekly-dos').innerText = weeklyDos[seed % weeklyDos.length];
+            document.getElementById('weekly-lucky').innerText = weeklyLucky[seed % weeklyLucky.length];
+            goToPage('page-weekly-result');
+        }
+
+        // ========== 前世今生 ==========
+        const pastlifeState = { type: '', feeling: '' };
+
+        const pastlifeData = [
+            { identity: '守护神殿的圣兽', story: '在遥远的古代，TA是神殿中被供奉的圣兽，守护着一方安宁。而你，是那个每日来神殿祈祷的虔诚信徒。你们在无数个晨昏中相伴，虽无言语，却有着超越时空的默契。今生TA找到了你，是为了继续那份未完的守护。', mission: '今生，TA来守护你的平凡生活，让你在喧嚣的世界中有一个安静的港湾。' },
+            { identity: '流浪的旅伴', story: '前世你们是一起流浪的旅伴，走过山川湖海，看过无数风景。那时的TA可能是一匹马、一只鹰，或是另一个流浪者。你们约定来世还要相遇，继续未完的旅程。今生TA如约而来，只是换了一个形态。', mission: '今生，TA要陪你探索生活中的每一个角落，让平淡的日子也充满冒险的乐趣。' },
+            { identity: '欠你的恩人', story: '前世，你曾在最危难的时刻救了TA一命。那份恩情TA记在心里，发誓来世要用一生来报答。所以今生TA找到了你，用全部的爱和陪伴来偿还那份跨越轮回的恩情。', mission: '今生，TA要用无条件的爱让你感受到：你值得被全心全意对待。' },
+            { identity: '前世的家人', story: '在某个前世，你们就是一家人。也许TA是你调皮的弟弟妹妹，或是慈爱的长辈。你们的灵魂记住了彼此的温度，所以今生又在茫茫人海中相遇，继续这份家人般的羁绊。', mission: '今生，TA要让你记起什么是无条件的接纳和归属感。' },
+            { identity: '守护你的精灵', story: '前世，TA是守护在你身边的小精灵，用魔法默默帮你化解生活中的小麻烦。只是那时的你看不见TA，不知道有这样一个存在一直在身边。今生TA终于可以被你看见、被你抱在怀里了。', mission: '今生，TA要成为你能看见、能触摸、能拥抱的幸运。' },
+            { identity: '未完成的约定', story: '前世你们有一个未完成的约定，也许是还没来得及说出口的话，也许是还没走完的路。所以今生，TA穿越重重阻碍来找你，就是为了兑现那个跨越时空的诺言。', mission: '今生，TA要陪你把那些来不及的事，一件一件都完成。' }
+        ];
+
+        function generatePastlife() {
+            const name = document.getElementById('pastlife-pet-name').value.trim();
+            if (!name || !pastlifeState.type || !pastlifeState.feeling) {
+                alert('请填写完整信息');
+                return;
+            }
+            const seed = name.length + pastlifeState.type.length + pastlifeState.feeling.length;
+            const data = pastlifeData[seed % pastlifeData.length];
+
+            document.getElementById('pastlife-title').innerText = `${name} 的前世今生`;
+            document.getElementById('pastlife-identity').innerText = data.identity;
+            document.getElementById('pastlife-story').innerText = data.story.replace(/TA/g, name);
+            document.getElementById('pastlife-mission').innerText = data.mission.replace(/TA/g, name);
+            goToPage('page-pastlife-result');
+        }
+
+        // ========== 今日幸运 ==========
+        const luckyColors = [
+            { name: '珊瑚粉', color: '#FF7F7F' },
+            { name: '薄荷绿', color: '#98FF98' },
+            { name: '天空蓝', color: '#87CEEB' },
+            { name: '奶油黄', color: '#FFFACD' },
+            { name: '薰衣草紫', color: '#E6E6FA' },
+            { name: '蜜桃橙', color: '#FFCC99' },
+            { name: '云朵白', color: '#F5F5F5' },
+            { name: '暖灰色', color: '#D3D3D3' }
+        ];
+
+        const luckyDirections = ['东', '南', '西', '北', '东南', '东北', '西南', '西北'];
+
+        const luckyFortunes = [
+            '今天是适合撒娇的日子，TA可能会用特别的方式向你求关注。',
+            '今天TA的直觉特别准，如果它对什么东西特别感兴趣，不妨顺着它。',
+            '今天适合安静地待在家里，一起享受慵懒的时光。',
+            '今天TA的能量很足，可以多陪它玩耍消耗一下精力。',
+            '今天可能会有小惊喜，注意观察TA的反应哦。',
+            '今天TA特别需要你的陪伴，尽量多抽时间和它在一起。'
+        ];
+
+        const luckySuggestions = [
+            '试着和TA说说话，它能感受到你声音中的温柔。',
+            '给TA换一个新玩具或者尝试新口味的零食。',
+            '花几分钟给TA梳梳毛或者按摩，增进你们的感情。',
+            '拍一张TA的照片，记录下这个平凡又珍贵的瞬间。',
+            '带TA晒晒太阳，阳光对它的心情和健康都有好处。',
+            '今天适合学习一个新的互动方式，让你们的相处更有趣。'
+        ];
+
+        function generateLucky() {
+            const name = document.getElementById('lucky-pet-name').value.trim();
+            const dob = document.getElementById('lucky-pet-dob').value;
+            if (!name || !dob) {
+                alert('请填写完整信息');
+                return;
+            }
+            const today = new Date();
+            const seed = today.getDate() + today.getMonth() + dob.split('-').reduce((a, b) => a + parseInt(b), 0);
+
+            const colorData = luckyColors[seed % luckyColors.length];
+            const number = (seed % 9) + 1;
+            const direction = luckyDirections[seed % luckyDirections.length];
+
+            document.getElementById('lucky-title').innerText = `${name} 的今日运势`;
+            document.getElementById('lucky-color-box').style.backgroundColor = colorData.color;
+            document.getElementById('lucky-color-name').innerText = colorData.name;
+            document.getElementById('lucky-number').innerText = number;
+            document.getElementById('lucky-direction').innerText = direction;
+            document.getElementById('lucky-fortune').innerText = luckyFortunes[seed % luckyFortunes.length];
+            document.getElementById('lucky-suggestion').innerText = luckySuggestions[seed % luckySuggestions.length];
+            goToPage('page-lucky-result');
+        }
+
+        // 更新 selectOption 以支持新的类别
+        const originalSelectOption = selectOption;
+        selectOption = function(category, element, value) {
+            if (category === 'pastlife-type') {
+                pastlifeState.type = value;
+            } else if (category === 'pastlife-feel') {
+                pastlifeState.feeling = value;
+            } else if (category === 'zodiac-type') {
+                // 仅视觉效果
+            }
+            // 保持原有逻辑
+            const siblings = element.parentElement.children;
+            for (let el of siblings) {
+                el.classList.remove('selected');
+            }
+            element.classList.add('selected');
+
+            // 更新原有状态
+            if (category === 'owner-status') state.ownerStatus = value;
+            if (category === 'pet-type') state.petType = value;
+            if (category === 'pet-feeling') state.petFeeling = value;
+            if (category === 'pet-gender') state.petGender = value;
+            if (category === 'pet-status') state.petStatus = value;
+        };
 
     </script>
 </body>
