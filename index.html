@@ -766,7 +766,7 @@
 
         <!-- 主宠配对结果页 -->
         <div class="page" id="page-compatibility-result">
-            <div class="result-card">
+            <div class="result-card" id="compat-result-card">
                 <h2 class="result-title" id="compat-title"></h2>
                 <div style="text-align: center; margin: 30px 0;">
                     <div style="font-size: 64px; font-weight: 300; color: #333;" id="compat-score"></div>
@@ -806,7 +806,7 @@
 
         <!-- 本周运势结果页 -->
         <div class="page" id="page-weekly-result">
-            <div class="result-card">
+            <div class="result-card" id="weekly-result-card">
                 <h2 class="result-title" id="weekly-title"></h2>
                 <div class="result-section">
                     <span class="result-label">整体运势</span>
@@ -863,7 +863,7 @@
 
         <!-- 前世今生结果页 -->
         <div class="page" id="page-pastlife-result">
-            <div class="result-card">
+            <div class="result-card" id="pastlife-result-card">
                 <h2 class="result-title" id="pastlife-title"></h2>
                 <div class="result-section">
                     <span class="result-label">前世身份</span>
@@ -903,7 +903,7 @@
 
         <!-- 今日幸运结果页 -->
         <div class="page" id="page-lucky-result">
-            <div class="result-card">
+            <div class="result-card" id="lucky-result-card">
                 <h2 class="result-title" id="lucky-title"></h2>
                 <div style="display: flex; justify-content: space-around; margin: 30px 0; text-align: center;">
                     <div>
@@ -1778,6 +1778,9 @@
             document.getElementById('zodiac-trait').innerText = data.trait;
             document.getElementById('zodiac-advice').innerText = data.advice;
             goToPage('page-zodiac-result');
+            setTimeout(() => {
+                document.getElementById('zodiac-result-card').classList.add('visible');
+            }, 100);
         }
 
         // ========== 主宠配对 ==========
@@ -1823,6 +1826,9 @@
             document.getElementById('compat-reading').innerText = reading;
             document.getElementById('compat-tips').innerText = tip;
             goToPage('page-compatibility-result');
+            setTimeout(() => {
+                document.getElementById('compat-result-card').classList.add('visible');
+            }, 100);
         }
 
         // ========== 本周运势 ==========
@@ -1874,6 +1880,9 @@
             document.getElementById('weekly-dos').innerText = weeklyDos[seed % weeklyDos.length];
             document.getElementById('weekly-lucky').innerText = weeklyLucky[seed % weeklyLucky.length];
             goToPage('page-weekly-result');
+            setTimeout(() => {
+                document.getElementById('weekly-result-card').classList.add('visible');
+            }, 100);
         }
 
         // ========== 前世今生 ==========
@@ -1902,6 +1911,9 @@
             document.getElementById('pastlife-story').innerText = data.story.replace(/TA/g, name);
             document.getElementById('pastlife-mission').innerText = data.mission.replace(/TA/g, name);
             goToPage('page-pastlife-result');
+            setTimeout(() => {
+                document.getElementById('pastlife-result-card').classList.add('visible');
+            }, 100);
         }
 
         // ========== 今日幸运 ==========
@@ -1958,6 +1970,9 @@
             document.getElementById('lucky-fortune').innerText = luckyFortunes[seed % luckyFortunes.length];
             document.getElementById('lucky-suggestion').innerText = luckySuggestions[seed % luckySuggestions.length];
             goToPage('page-lucky-result');
+            setTimeout(() => {
+                document.getElementById('lucky-result-card').classList.add('visible');
+            }, 100);
         }
 
         // 更新 selectOption 以支持新的类别
